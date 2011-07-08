@@ -1,0 +1,7 @@
+Create list of stars.
+
+From first star to last.
+Render star on the background.
+    For each star pixel, see if pixel already exists in sparse background.
+	If doesn't exist, store it.
+	If it does exist, calculate sum then store.

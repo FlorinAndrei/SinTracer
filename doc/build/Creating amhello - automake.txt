@@ -1,0 +1,146 @@
+   Link: [1]Top (start)
+   Link: [2]Hello World (parent)
+   Link: [3]amhello Explained (next)
+   Link: [4]Texinfo Homepage (generator-home)
+
+   Next: [5]amhello Explained, Up: [6]Hello World
+
+   --------------------------------------------------------------------------
+
+    2.4.1 Creating amhello-1.0.tar.gz
+
+   Here is how we can recreate amhello-1.0.tar.gz from scratch. The package
+   is simple enough so that we will only need to write 5 files. (You may copy
+   them from the final amhello-1.0.tar.gz that is distributed with Automake
+   if you do not want to write them.)
+
+   Create the following files in an empty directory.
+
+     * src/main.c is the source file for the hello program. We store it in
+       the src/ subdirectory, because later, when the package evolves, it
+       will ease the addition of a man/ directory for man pages, a data/
+       directory for data files, etc.
+
+           ~/amhello % cat src/main.c
+           #include <config.h>
+           #include <stdio.h>
+
+           int
+           main (void)
+           {
+             puts ("Hello World!");
+             puts ("This is " PACKAGE_STRING ".");
+             return 0;
+           }
+
+     * README contains some very limited documentation for our little
+       package.
+
+           ~/amhello % cat README
+           This is a demonstration package for GNU Automake.
+           Type `info Automake' to read the Automake manual.
+
+     * Makefile.am and src/Makefile.am contain Automake instructions for
+       these two directories.
+
+           ~/amhello % cat src/Makefile.am
+           bin_PROGRAMS = hello
+           hello_SOURCES = main.c
+           ~/amhello % cat Makefile.am
+           SUBDIRS = src
+           dist_doc_DATA = README
+
+     * Finally, configure.ac contains Autoconf instructions to create the
+       configure script.
+
+           ~/amhello % cat configure.ac
+           AC_INIT([amhello], [1.0], [bug-automake@gnu.org])
+           AM_INIT_AUTOMAKE([-Wall -Werror foreign])
+           AC_PROG_CC
+           AC_CONFIG_HEADERS([config.h])
+           AC_CONFIG_FILES([
+            Makefile
+            src/Makefile
+           ])
+           AC_OUTPUT
+
+   Once you have these five files, it is time to run the Autotools to
+   instantiate the build system. Do this using the autoreconf command as
+   follows:
+
+      ~/amhello % autoreconf --install
+      configure.ac: installing `./install-sh'
+      configure.ac: installing `./missing'
+      src/Makefile.am: installing `./depcomp'
+
+   At this point the build system is complete.
+
+   In addition to the three scripts mentioned in its output, you can see that
+   autoreconf created four other files: configure, config.h.in, Makefile.in,
+   and src/Makefile.in. The latter three files are templates that will be
+   adapted to the system by configure under the names config.h, Makefile, and
+   src/Makefile. Let's do this:
+
+      ~/amhello % ./configure
+      checking for a BSD-compatible install... /usr/bin/install -c
+      checking whether build environment is sane... yes
+      checking for gawk... no
+      checking for mawk... mawk
+      checking whether make sets $(MAKE)... yes
+      checking for gcc... gcc
+      checking for C compiler default output file name... a.out
+      checking whether the C compiler works... yes
+      checking whether we are cross compiling... no
+      checking for suffix of executables...
+      checking for suffix of object files... o
+      checking whether we are using the GNU C compiler... yes
+      checking whether gcc accepts -g... yes
+      checking for gcc option to accept ISO C89... none needed
+      checking for style of include used by make... GNU
+      checking dependency style of gcc... gcc3
+      configure: creating ./config.status
+      config.status: creating Makefile
+      config.status: creating src/Makefile
+      config.status: creating config.h
+      config.status: executing depfiles commands
+
+   You can see Makefile, src/Makefile, and config.h being created at the end
+   after configure has probed the system. It is now possible to run all the
+   targets we wish (see [7]Standard Targets). For instance:
+
+      ~/amhello % make
+      ...
+      ~/amhello % src/hello
+      Hello World!
+      This is amhello 1.0.
+      ~/amhello % make distcheck
+      ...
+      =============================================
+      amhello-1.0 archives ready for distribution:
+      amhello-1.0.tar.gz
+      =============================================
+
+   Note that running autoreconf is only needed initially when the GNU Build
+   System does not exist. When you later change some instructions in a
+   Makefile.am or configure.ac, the relevant part of the build system will be
+   regenerated automatically when you execute make.
+
+   autoreconf is a script that calls autoconf, automake, and a bunch of other
+   commands in the right order. If you are beginning with these tools, it is
+   not important to figure out in which order all these tools should be
+   invoked and why. However, because Autoconf and Automake have separate
+   manuals, the important point to understand is that autoconf is in charge
+   of creating configure from configure.ac, while automake is in charge of
+   creating Makefile.ins from Makefile.ams and configure.ac. This should at
+   least direct you to the right manual when seeking answers.
+
+References
+
+   Visible links
+   1. http://www.gnu.org/software/hello/manual/automake/index.html#Top
+   2. http://www.gnu.org/software/hello/manual/automake/Hello-World.html#Hello-World
+   3. http://www.gnu.org/software/hello/manual/automake/amhello-Explained.html#amhello-Explained
+   4. http://www.gnu.org/software/texinfo/
+   5. http://www.gnu.org/software/hello/manual/automake/amhello-Explained.html#amhello-Explained
+   6. http://www.gnu.org/software/hello/manual/automake/Hello-World.html#Hello-World
+   7. http://www.gnu.org/software/hello/manual/automake/Standard-Targets.html#Standard-Targets

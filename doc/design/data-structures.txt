@@ -1,0 +1,76 @@
+Current frame
+=============
+Array of pixels.
+Imitate the angle of a regular digital camera.
+
+
+Pixel
+=====
+4 x 8bit quad
+RGB + one more byte.
+
+typedef struct
+{
+	unsigned char red;
+	unsigned char green;
+	unsigned char blue;
+	unsigned char alpha;
+} pixel;
+
+Not sure yet what to do with the alpha byte.
+
+
+Cosmos
+======
+List of all stars.
+
+Total number: 9110 (it's the actual number in the real cosmos).
+
+star cosmos[9110];
+
+
+Star
+====
+typedef struct
+{
+	double mag;				/* brightness in magnitude numbers */
+	unsigned long temp;		/* temperature in K */
+	double latit;			/* sky latitude of center */
+	double longit;			/* sky longitude */
+	double radius;			/* apparent size of the disk (fake, I just need some pixels) */
+} star;
+
+
+Background
+==========
+Projection of Cosmos data structure as a sparse pixel matrix.
+Polar coordinates.
+Lat/long resolution determined by size of Cell cache.
+
+If a lat circle has no stars, it does not exist.
+
+On each lat circle, only non-black pixels are stored, as lat-groups of pixels.
+
+
+Lat-circle list
+===============
+Array.
+Each line is a background latitude circle that contains at least one 
+non-black pixel.
+Two columns:
+- latitude of circle
+- pointer to actual lat circle data structure
+
+
+Lat circle
+==========
+Array. Allocated after Cosmos is generated.
+Contains lat-groups of pixels.
+First field: number of lat-groups in this circle.
+
+
+Lat-group of pixels
+===================
+First 2-byte int: longitude of first pixel
+Second 2-byte int: number of successive pixels in group
+Then the successive non-black pixels in this group.
